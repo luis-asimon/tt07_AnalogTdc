@@ -57,7 +57,8 @@ pinout:
   ua[1]: "Pulse"
   ua[2]: "Vout"
   ua[3]: "CL"
-
+  ua[4]: ""
+  ua[5]: ""
 
 # Do not change!
 yaml_version: 6
