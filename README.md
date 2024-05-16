@@ -1,36 +1,43 @@
-![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg)
+<!---
 
-# Tiny Tapeout Analog Project Template
+This file is used to generate your project datasheet. Please fill in the information below and delete any unused
+sections.
 
-- [Read the documentation for project](docs/info.md)
+You can also include images in this folder and reference them in the markdown. Each image must be less than
+512 kb in size, and the combined size of all images must be less than 1 MB.
+-->
+# Analog TDC
 
-## What is Tiny Tapeout?
+## How it works
 
-Tiny Tapeout is an educational project that aims to make it easier and cheaper than ever to get your digital designs manufactured on a real chip.
+A Time to Digital Converter (TDC) is a circuit that measures the time interval between two events with high precision and converts this into a digital value. TDCs are fundamental components in various applications, including digital communications, radar systems, particle physics experiments, etc.
+The operation of a TDC can be classified into two types: direct and indirect measurement methods. Direct measurement capture time interval using a high-speed clock signal and a counter, while indirect methods employ in the first stage a Time-to-Voltage conversion followed by an analog-to-digital conversion or other similar blocks. 
+The resolution of a TDC is determined by the frequency of the clock that drives the counter (Resolution=1/clock_frequency). Resolution in a TDC is defined as the smallest time difference that can be measured and distinguished by the converter. To achieve a balance between high resolution and wide dynamic range, it involves the use of coarse and fine resolution measurements within a single TDC architecture. Coarse resolution typically achieved using a counter that increments in every cycle of a clock. Fine resolution is employed to measure smaller segments of time within the coarse intervals, significantly improving the overall precision of the TDC often realized through techniques like time interpolation, delay line encoding, or the use of high-frequency clocks for a short duration. 
+In a TDC using coarse and fine resolutions, the time interval between two events is first quantified in coarse units. Then, the fine resolution measures the fraction of the coarse unit that remains unaccounted for at the end of the interval. The total resolution is a combination of both resolutions, where the fine resolution refines the measurement within one coarse clock cycle. This combination offers a detailed time measurement while maintaining the capability to measure long intervals.
+The circuit present here comprises the analog part for the fine resolution of a Time to Digital Converter based on time interpolation. A width input pulse in the interval of 20 to 60 nanoseconds is converted to a periodic square signal with a period that is 90 times wider than the input pulse. So, we can use a counter with a low frequency clock to convert the time input pulse to digital format. For example, if we use a 25MHz clock frequency, we can measure the time of the input pulse with a resolution of 444ps.    
+In the Fig. 1 we can see the block diagram of the System. We introduce an input pulse on the input "Time" (after applying a reset on the capacitors) and charge the two capacitors in the first block with a constant current. They stop charging when the pulse finishes. The second block uses the voltages generated in the first block as references to charge and discharge a capacitor, generating a square signal at the output. The period of the output signal is equal to: T=90*Delta_Time.
 
-To learn more and get started, visit https://tinytapeout.com.
+![](system_diagram.png)
+**Figure 1.** Block diagram of the System.
 
-## Analog projects
 
-For specifications and instructions, see the [analog specs page](https://tinytapeout.com/specs/analog/).
+## How to test
+Figure 2 shows the block of the System with all the inputs and outputs that we can access in the circuit. The diagram shows the signal that we need to apply for to get the desired output signal. We can apply a width pulse between 20 to 60ns (at the pin pulse), besides the reset signals to discharge the capacitors (reset and resetCH pines), one before and one after the pulse, as shown the Figure 2. Connecting an oscilloscope to the output (Vout and VoutN) allows us to see the square periodic signal with a period proportional to the width of the input pulse, as explained in the first section. CH and CL are only used to monitor the behaviour of the comparators.
 
-## Enable GitHub actions to build the results page
+![](block_system.png)
 
-- [Enabling GitHub Pages](https://tinytapeout.com/faq/#my-github-action-is-failing-on-the-pages-part)
+**Figure 2.** Inputs and Outputs of the System and test signals.
 
-## Resources
 
-- [FAQ](https://tinytapeout.com/faq/)
-- [Digital design lessons](https://tinytapeout.com/digital_design/)
-- [Learn how semiconductors work](https://tinytapeout.com/siliwiz/)
-- [Join the community](https://tinytapeout.com/discord)
-- [Build your design locally](https://docs.google.com/document/d/1aUUZ1jthRpg4QURIIyzlOaPWlmQzr-jBn3wZipVUPt4)
+Look at Figure 3 for the circuit's connection to the chip frame, and at Figure 4 for the simulation results showing how the circuit behaves.  
 
-## What next?
+![](pins_block.png)
+**Figure 3.** Pins used from the frame.
+ 
 
-- [Submit your design to the next shuttle](https://app.tinytapeout.com/).
-- Edit [this README](README.md) and explain your design, how it works, and how to test it.
-- Share your project on your social network of choice:
-  - LinkedIn [#tinytapeout](https://www.linkedin.com/search/results/content/?keywords=%23tinytapeout) [@TinyTapeout](https://www.linkedin.com/company/100708654/)
-  - Mastodon [#tinytapeout](https://chaos.social/tags/tinytapeout) [@matthewvenn](https://chaos.social/@matthewvenn)
-  - X (formerly Twitter) [#tinytapeout](https://twitter.com/hashtag/tinytapeout) [@matthewvenn](https://twitter.com/matthewvenn)
+![](simulation_result.png)
+**Figure 4.** Simulation results.
+
+
+## External hardware
+You need only a digital signal generator to generate the input pulse and reset signals, current source of 13uA to biasing and an oscilloscope to see the results.
